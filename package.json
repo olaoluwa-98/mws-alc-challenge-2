@@ -1,0 +1,25 @@
+{
+  "name": "mws-alc-challenge-2",
+  "version": "1.0.0",
+  "description": "currency converter, a alc 3.0 challenge",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "currency",
+    "sw",
+    "indexdb",
+    "js"
+  ],
+  "dependencies": {
+    "express": "^4.14.1",
+    "serve-static": "^1.13.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/olaoluwa-98/mws-alc-challenge-2.git"
+  },
+  "author": "Emmanuel Awotunde",
+  "license": "MIT"
+}

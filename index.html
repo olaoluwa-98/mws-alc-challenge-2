@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#000000" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="css/materialize.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Currency Converter (ALC 3.0)</title>
+</head>
+
+<body>
+  <!-- navbar -->
+  <nav>
+    <div class="nav-wrapper teal lighten-2">
+      <a href="index.html" class="brand-logo center">Currency Converter</a>
+      <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+        <i class="material-icons">menu</i>
+      </a>
+      <ul class="left hide-on-med-and-down">
+        <li>
+          <a href="#">
+            <i class="large material-icons" id="signal">signal_wifi_off</i>
+          </a>
+        </li>
+      </ul>
+      <ul class="right hide-on-med-and-down">
+        <li>
+          <a href="about.html">About</a>
+        </li>
+        <li>
+          <a href="contact.html">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <ul class="sidenav" id="mobile-demo">
+    <li>
+      <a href="#">
+        <i class="large material-icons" id="signal">signal_wifi_off</i>
+      </a>
+    </li>
+    <li>
+      <a href="about.html">About</a>
+    </li>
+    <li>
+      <a href="contact.html">Contact</a>
+    </li>
+  </ul>
+
+  <!-- body -->
+  <div class="card" id="currency-calculator-box">
+    <div class="card-content white-text">
+      <span class="card-title" style="text-align: center;color: black"
+        id="result"></span>
+      <form>
+        <div class="row">
+        <div class="input-field col s6">
+          <select id="currencies1" class="browser-default"
+           onchange="currencyApp.fetchConversionRate()">
+            <!-- <option value="" selected>...</option> -->
+          </select>
+        </div>
+        <div class="input-field col s6">
+          <select id="currencies2" class="browser-default"
+           onchange="currencyApp.fetchConversionRate()">
+            <!-- <option value="" selected>...</option> -->
+          </select>
+        </div>
+        </div>
+
+        <div class="row">
+          <div class="input-field col s6">
+            <input id="amount1" type="number" class="validate"
+             onkeyup="currencyApp.changeAmount('amount1')" value="1">
+            <label for="amount1">Amount in <span id="amount1Label"></span></label>
+          </div>
+          <div class="input-field col s6">
+            <input id="amount2" type="number" class="validate"
+             onkeyup="currencyApp.changeAmount('amount2')" value="1">
+            <label for="amount2">Amount in <span id="amount2Label"></span></label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <footer class="page-footer teal">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">Currency Converter</h5>
+          <p class="grey-text text-lighten-4">
+            An ALC 3.0 Challenge.
+          </p>
+        </div>
+        <div class="col l4 offset-l2 s12">
+          <h5 class="white-text">Links</h5>
+          <ul>
+            <li>
+              <a class="grey-text text-lighten-3" href="index.html">Home</a>
+            </li>
+            <li>
+              <a class="grey-text text-lighten-3" href="about.html">About</a>
+            </li>
+            <li>
+              <a class="grey-text text-lighten-3" href="contact.html">Contact</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+        © Currency Converter, 2018.
+         Built by
+        <a class="orange-text text-lighten-2" href="https://twitter.com/olaoluwa_98">
+          Awo
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="snackbar">
+    <span id="snackbar-text"></span>
+    <button onclick="closeToast()">CLOSE</button>
+  </div>
+
+  <script src="js/idb.min.js"></script>
+  <script src="js/materialize.min.js"></script>
+  <script src="js/converter-app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var elems = document.querySelectorAll('.sidenav');
+      var instances = M.Sidenav.init(elems, {});
+      
+      // var elems = document.querySelectorAll('select');
+      // var instances = M.FormSelect.init(elems, {});
+    });
+  </script>
+</body>
+
+</html>
