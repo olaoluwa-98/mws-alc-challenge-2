@@ -1,6 +1,6 @@
 const API_URL = 'https://free.currencyconverterapi.com';
 let elements = {
-    signal: document.querySelector('#signal'),
+    signal: document.querySelectorAll('.signal'),
     currencies1: document.querySelector('#currencies1'),
     currencies2: document.querySelector('#currencies2'),
 
@@ -44,6 +44,7 @@ class CurrencyConverterApp {
         this.currencies = [];
         this._db = openDB();
         this._registerServiceWorker();
+        this._updateNetworkStatus();
         this._checkNetwork();
         this._getCurrencies();
     }
@@ -62,23 +63,26 @@ class CurrencyConverterApp {
 
     _updateNetworkStatus() {
         const app = this;
-        debugger;
         if (navigator.onLine) {
             closeToast();
             showToast('Online');
-            elements.signal.innerHTML= "network_wifi";
+            for (let sig of elements.signal) {
+                sig.textContent = "network_wifi";
+            }
         } else {
             closeToast();
             showToast('Offline');
-            elements.signal.innerHTML = "signal_wifi_off";
+            for (let sig of elements.signal) {
+                sig.textContent = "signal_wifi_off";
+            }
         }
-    }    
+    }
 
     _checkNetwork() {
         window.addEventListener('online', this._updateNetworkStatus);
         window.addEventListener('offline', this._updateNetworkStatus);
     }
-    
+
     _showCurrencies(currencies) {
         for (let currency of currencies) {
             const option = document.createElement('option');
@@ -93,7 +97,7 @@ class CurrencyConverterApp {
             elements.currencies2.add(option);
         }
     }
-    
+
     _storeCurrencies(currencies) {
         this._db.then(db => {
             if (!db) return;
@@ -102,7 +106,7 @@ class CurrencyConverterApp {
             let store = tx.objectStore('currencies');
             store.openCursor(null).then(function deleteRest(cursor) {
                 if (!cursor) return;
-                cursor.delete();
+                if (currencies.find(x => x.id == cursor.value.id)) cursor.delete();
                 return cursor.continue().then(deleteRest);
             });
             currencies.forEach(currency => {
@@ -132,7 +136,7 @@ class CurrencyConverterApp {
                     app._storeCurrencies(app.currencies);
                 });
             } else {
-                app._dbPromise.then(db => {
+                app._db.then(db => {
                     if (!db) return;
 
                     let tx = db.transaction('currencies').objectStore('currencies');
@@ -150,26 +154,67 @@ class CurrencyConverterApp {
     _displayConversion(rate, query) {
         const app = this;
         const currency1 = query.split('_')[0];
+        elements.amount1Label.textContent = currency1;
         const currency2 = query.split('_')[1];
+        elements.amount2Label.textContent = currency2;
         elements.result.textContent = `1${
-          app.currencies.find(x => currency1 == x.id ).symbol || 
-          app.currencies.find(x => currency1 == x.id ).name
-        } equals
+            app.currencies.find(x => currency1 == x.id).symbol ||
+            app.currencies.find(x => currency1 == x.id).name
+            } =
         ${
-          app.currencies.find(x => currency2 == x.id).symbol || 
-          app.currencies.find(x => currency2 == x.id).name
-        }${rate}        
+            app.currencies.find(x => currency2 == x.id).symbol ||
+            app.currencies.find(x => currency2 == x.id).name
+            }${rate}        
         `;
     }
 
     _applyConversion(rate, query) {
         const app = this;
         app._displayConversion(rate, query);
-        if (app.inputTrigger == 'input1') {
-            elements.input2.value = Number(elements.input1.value) * Number(rate);
-        } else if (app.inputTrigger == 'input2') {
-            elements.input1.value = Number(elements.input2.value) / Number(rate);
+        if (app.inputTrigger == 'amount1') {
+            elements.amount2.value = Number(elements.amount1.value) * Number(rate);
+        } else if (app.inputTrigger == 'amount2') {
+            elements.amount1.value = Number(elements.amount2.value) / Number(rate);
         }
+    }
+
+    _storeConversion(conversion) {
+        this._db.then(db => {
+            if (!db) return;
+
+            let tx = db.transaction('conversions', 'readwrite');
+            let store = tx.objectStore('conversions');
+            store.openCursor(null).then(function deleteConversion(cursor) {
+                if (!cursor) return;
+                if (cursor.value.id == conversion.id) cursor.delete();
+                return cursor.continue().then(deleteConversion);
+            });
+            store.put(conversion);
+        });
+    }
+
+    _getCurrenciesFromIDB() {
+        const app = this;
+        app._db.then(db => {
+            if (!db) return;
+
+            let tx = db.transaction('currencies').objectStore('currencies');
+            return tx.getAll().then(currencies => {
+                app._showCurrencies(currencies);
+            });
+        });
+    }
+
+    _getConversionFromIDB() {
+        const app = this;
+        app._db.then(db => {
+            if (!db) return;
+
+            let tx = db.transaction('conversions').objectStore('conversions');
+            return tx.getOne(query).then(conversion => {
+                app._applyConversion(conversion.val, query);
+            });
+        });
     }
 
     fetchConversionRate() {
@@ -191,7 +236,7 @@ class CurrencyConverterApp {
                         response.results[query].val,
                         query,
                     );
-                    app._storeConversionInIDB(response.results[query]);
+                    app._storeConversion(response.results[query]);
 
                 });
             } else {
@@ -203,7 +248,7 @@ class CurrencyConverterApp {
         }
     }
 
-    changeAmount(inputTrigger = 'input1') {
+    changeAmount(inputTrigger = 'amount1') {
         const app = this;
         app.inputTrigger = inputTrigger;
         app.fetchConversionRate();
