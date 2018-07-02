@@ -2,6 +2,8 @@ const cachesName = 'currency-converter-v1';
 
 const filesToCache = [
   '/',
+  '/about.html',
+  '/contact.html',
   'js/materialize.min.js',
   'js/idb.min.js',
   'js/converter-app.js',
